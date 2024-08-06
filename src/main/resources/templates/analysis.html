@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis</title>
+    <style>
+        table {
+            margin: auto;
+            width: 70%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        .codeLink {
+            text-decoration: underline;
+            color: darkblue;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function redirectToDetails(code, name) {
+            let url = '/analysis/program?code=' + code;
+            url += '&name=' + name;
+            window.location.href = url;
+        }
+    </script>
+</head>
+<body>
+    <h1></h1>
+    <div id="jsonData" style="display: none;">[[${jsonData}]]</div>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>종목 이름</th>
+                <th>종목 코드</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        let jsonDataElement = document.getElementById('jsonData');
+        let jsonData = jsonDataElement.textContent;
+        let data = JSON.parse(jsonData); // 서버에서 전달받은 json 파싱
+        let tbody = document.querySelector('#dataTable tbody');
+
+        // JSON 데이터를 테이블에 추가
+        data.forEach(item => {
+            let row = document.createElement('tr');
+            let nameTD = document.createElement('td');
+            nameTD.textContent = item.Name;
+            let codeTD = document.createElement('td');
+            codeTD.setAttribute("class", "codeLink");
+            codeTD.textContent = item.Code;
+            codeTD.onclick = () => redirectToDetails(item.Code, item.Name);
+            row.appendChild(nameTD);
+            row.appendChild(codeTD);
+            tbody.appendChild(row);
+        });
+    </script>
+</body>
+</html>

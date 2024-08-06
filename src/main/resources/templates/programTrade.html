@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>program trade</title>
+    <style>
+        table {
+            margin: auto;
+            width: 80%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        .down {
+            color: red;
+        }
+        .up {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1 th:text="${tName}"></h1>
+    <h2 id="title"></h2>
+    <div id="jsonData" style="display: none;">[[${tradeList}]]</div>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>시간</th>
+                <th>현재가</th>
+                <th>전일 대비</th>
+                <th>등락률(%)</th>
+                <th>거래량</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1; // 0부터 시작
+        const day = today.getDate();
+        const ymd = year + "-" + month + "-" + day;
+        document.getElementById('title').innerHTML = ymd;
+
+        let jsonDataElement = document.getElementById('jsonData');
+        let jsonData = jsonDataElement.textContent;
+        let data = JSON.parse(jsonData); // 서버에서 전달받은 json 파싱
+        let tbody = document.querySelector('#dataTable tbody');
+        let output = data.output
+
+        // JSON 데이터로 테이블 생성
+        output.forEach(item => {
+            let row = document.createElement('tr');
+            // 시간
+            let eventTime = document.createElement('td');
+            let hour = item.bsop_hour.substr(0, 2);
+            let min = item.bsop_hour.substr(2, 2);
+            let sec = item.bsop_hour.substr(4, 2);
+            eventTime.textContent =  hour + ":" + min + ":" + sec;
+
+            // 현재가
+            let prpr = document.createElement('td');
+            prpr.textContent = item.stck_prpr;
+
+            // 전일 대비
+            let vrss = document.createElement('td');
+            let numVrss = parseInt(item.prdy_vrss);
+            let prdyVrss = "";
+            let className = "";
+            if (numVrss < 0){
+                numVrss *= -1
+                prdyVrss = "▼ " + numVrss;
+                className = "down"
+            } else {
+                prdyVrss = "▲ " + numVrss;
+                className = "up"
+            }
+            vrss.textContent = prdyVrss;
+            vrss.setAttribute("class", className);
+
+            // 등락률
+            let ctrt = document.createElement('td');
+            ctrt.textContent = item.prdy_ctrt;
+
+            // 누적 거래량
+            let acmlVol = document.createElement('td');
+            acmlVol.textContent = item.acml_vol;
+
+            row.appendChild(eventTime);
+            row.appendChild(prpr);
+            row.appendChild(vrss);
+            row.appendChild(ctrt);
+            row.appendChild(acmlVol);
+            tbody.appendChild(row);
+        });
+    </script>
+</body>
+</html>
