@@ -5,15 +5,28 @@
     <title>Analysis</title>
     <style>
         table {
+			border: 1px solid black;
             margin: auto;
             width: 70%;
             border-collapse: collapse;
         }
-        th, td {
-            border: 1px solid black;
+		
+		thead {
+			border: 1px solid black;
+		}
+		
+		th {
+            border: none;
             padding: 8px;
             text-align: left;
         }
+		
+        td {
+            border: none;
+            padding: 10px;
+            text-align: center;
+        }
+		
         .codeLink {
             text-decoration: underline;
             color: darkblue;
@@ -32,35 +45,49 @@
     <h1></h1>
     <div id="jsonData" style="display: none;">[[${jsonData}]]</div>
     <table id="dataTable">
-        <thead>
-            <tr>
-                <th>종목 이름</th>
-                <th>종목 코드</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
+
     </table>
 
     <script>
         let jsonDataElement = document.getElementById('jsonData');
         let jsonData = jsonDataElement.textContent;
         let data = JSON.parse(jsonData); // 서버에서 전달받은 json 파싱
-        let tbody = document.querySelector('#dataTable tbody');
+        //let tbody = document.querySelector('#dataTable tbody');
+		let table = document.querySelector('#dataTable');
 
-        // JSON 데이터를 테이블에 추가
-        data.forEach(item => {
-            let row = document.createElement('tr');
-            let nameTD = document.createElement('td');
-            nameTD.textContent = item.Name;
-            let codeTD = document.createElement('td');
-            codeTD.setAttribute("class", "codeLink");
-            codeTD.textContent = item.Code;
-            codeTD.onclick = () => redirectToDetails(item.Code, item.Name);
-            row.appendChild(nameTD);
-            row.appendChild(codeTD);
-            tbody.appendChild(row);
+        // JSON 데이터를 테이블에 추가	
+		data.forEach(item => {
+			let thead = document.createElement('thead');
+			let htr = document.createElement('tr');
+			let hth = document.createElement('th');
+            hth.textContent = item.Name;
+			hth.setAttribute("colspan", 10);
+			htr.appendChild(hth);
+			thead.appendChild(htr);
+			table.appendChild(thead);
+			
+			// Code 번호들 추가
+			let tbodyNum = document.createElement('tbody');
+			let r = document.createElement('tr');
+			var count = 0;
+			item.Code.forEach(nums => {
+				count += 1;
+				let td = document.createElement('td');
+				td.textContent = nums;
+				td.setAttribute("class", "codeLink");
+				td.onclick = () => redirectToDetails(nums, item.Name);
+				r.appendChild(td);
+				if (count == 10){
+					tbodyNum.appendChild(r);
+					r = document.createElement('tr');
+					count = 0;
+				}
+			});
+			
+			tbodyNum.appendChild(r);
+			table.appendChild(tbodyNum);
         });
+
     </script>
 </body>
 </html>

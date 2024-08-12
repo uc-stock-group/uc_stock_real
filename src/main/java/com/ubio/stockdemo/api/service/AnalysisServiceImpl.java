@@ -65,4 +65,33 @@ public class AnalysisServiceImpl implements AnalysisService {
         log.info(response.getBody());
         return response.getBody();
     }
+    
+    @Override
+    public String analysisDaily(long code, String date) {
+        String url = apiDomain + "/uapi/domestic-stock/v1/quotations/program-trade-by-stock-daily";
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("FID_INPUT_ISCD", code)
+                .queryParam("FID_INPUT_DATE_1", date);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String token = "Bearer " + accessToken;
+        headers.add("authorization", token);
+        headers.add("appkey", appKey);
+        headers.add("appsecret", appSecret);
+        headers.add("tr_id", "FHPPG04650100");
+        URI uri = uriBuilder.build().encode().toUri();
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+            uri,
+            HttpMethod.GET,
+            entity,
+            String.class
+        );
+        
+        log.info(response.getBody());
+        return response.getBody();
+    }
 }
