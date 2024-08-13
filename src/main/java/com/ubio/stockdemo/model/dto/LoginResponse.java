@@ -9,5 +9,6 @@ public class LoginResponse {
     private String appKey;
     private String appSecret;
     private String realCano;
-    private AccessToken accessToken;
+    private StockToken stockToken;
+    private String accessToken;
 }

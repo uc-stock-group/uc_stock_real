@@ -1,6 +1,7 @@
-package com.ubio.stockdemo.api.service;
+package com.ubio.stockdemo.api.service.impl;
 
 import com.ubio.stockdemo.api.repository.GroupRepository;
+import com.ubio.stockdemo.api.service.GroupService;
 import com.ubio.stockdemo.model.entity.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
