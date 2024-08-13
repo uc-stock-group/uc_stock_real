@@ -1,7 +1,6 @@
 package com.ubio.stockdemo.api.controller;
 
 import com.ubio.stockdemo.api.service.ApiService;
-import com.ubio.stockdemo.api.service.ApiServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +24,12 @@ public class ApiController {
     @GetMapping("/getaccount")
     public String getAccount() {
         return apiService.getAccount();
+    }
+    
+    // 실시간 웹소켓 접속키 발급
+    @PostMapping("/realtime/login")
+    public String RealtimeLogin() {
+    	return apiService.realtimeLogin();
     }
 
 

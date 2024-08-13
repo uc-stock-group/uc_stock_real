@@ -4,4 +4,6 @@ public interface ApiService {
     String login();
 
     String getAccount();
+    
+    String realtimeLogin();
 }

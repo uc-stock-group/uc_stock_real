@@ -33,6 +33,9 @@ public class ApiServiceImpl implements ApiService {
 
     @Value("${apiInfo.accountNo}")
     private String accountNo;
+    
+    @Value("${apiInfo.approval_key}")
+    private String approvalKey;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -106,5 +109,42 @@ public class ApiServiceImpl implements ApiService {
         );
 
         return response.getBody();
+    }
+    
+    // 실시간(웹소켓) 로그인
+    @Override
+    public String realtimeLogin() {
+    	
+    	String url = apiDomain + "/oauth2/Approval";
+
+		 HttpHeaders headers = new HttpHeaders();
+	     headers.setContentType(MediaType.APPLICATION_JSON);
+	
+	     // Map to hold request body
+	     Map<String, String> requestBodyMap = new HashMap<>();
+	     requestBodyMap.put("grant_type", "client_credentials");
+	     requestBodyMap.put("appkey", appKey);
+	     requestBodyMap.put("secretkey", appSecret);
+	
+	     // Convert Map to JSON string
+	     ObjectMapper objectMapper = new ObjectMapper();
+	     String requestBody = "";
+	     try {
+	         requestBody = objectMapper.writeValueAsString(requestBodyMap);
+	     } catch (JsonProcessingException e) {
+	         log.error("Error converting map to JSON", e);
+	     }
+	
+	     HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+	
+	     ResponseEntity<String> response = restTemplate.exchange(
+	             url,
+	             HttpMethod.POST,
+	             entity,
+	             String.class
+	     );
+	     log.info(response.getBody());
+	     return response.getBody();
+
     }
 }
