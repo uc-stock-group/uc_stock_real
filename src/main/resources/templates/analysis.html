@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <title>Analysis</title>
     <style>
+		#option {
+			margin: 20px;
+		}
+		
+		#calendar {
+			width: 130px;
+			height: 25px;
+			text-align: center;
+			font-size: 14px;
+		}
+		
         table {
 			border: 1px solid black;
             margin: auto;
@@ -35,20 +46,68 @@
     </style>
     <script>
         function redirectToDetails(code, name) {
-            let url = '/analysis/program?code=' + code;
-            url += '&name=' + name;
-            window.location.href = url;
+			let option = document.querySelector('input[name="optionBtn"]:checked').value;
+			
+			switch (option){
+				case "time":
+				let url1 = '/analysis/program?code=' + code;
+	            url1 += '&name=' + name;
+	            window.location.href = url1;
+				break;
+				
+				case "date":
+				let day = document.getElementById('calendar').value;
+				day = day.replaceAll("-", "");
+				
+				let url2 = '/analysis/programDaily?code=' + code;
+				url2 += '&date=' + day;
+	            url2 += '&name=' + name;
+	            window.location.href = url2;
+				break;
+			}
+			
+            
         }
+		
+		// 일자별, 시간별 선택에 따라 date input 활성화
+		document.addEventListener('DOMContentLoaded', function() {
+		    const radioButtons = document.querySelectorAll('input[name="optionBtn"]');
+		    
+		    radioButtons.forEach(function(radio) {
+		        radio.addEventListener('change', function(event) {
+		            const selectedValue = event.target.value;
+		            if (selectedValue == "date"){
+						calendar.removeAttribute("disabled");	
+					} else {
+						calendar.setAttribute("disabled");
+					}
+		        });
+		    });
+		});
+		
+		
     </script>
 </head>
 <body>
     <h1></h1>
+	<div id="option">
+		<input type="radio" id="op1" name="optionBtn" value="time" checked />
+	    <label for="op1">시간별</label>
+	
+	    <input type="radio" id="op2" name="optionBtn" value="date" />
+		<label for="op2" style="margin-right: 25px;">일자별</label>
+		
+		<input type="date" id="calendar" disabled/>
+	</div>
     <div id="jsonData" style="display: none;">[[${jsonData}]]</div>
     <table id="dataTable">
 
     </table>
 
     <script>
+		const calendar = document.getElementById('calendar');
+		calendar.value = new Date().toISOString().substring(0, 10);
+		calendar.max = new Date().toISOString().substring(0, 10);
         let jsonDataElement = document.getElementById('jsonData');
         let jsonData = jsonDataElement.textContent;
         let data = JSON.parse(jsonData); // 서버에서 전달받은 json 파싱
