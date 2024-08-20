@@ -62,7 +62,7 @@ public class AnalysisServiceImpl implements AnalysisService {
             String.class
         );
         
-        log.info(response.getBody());
+        // log.info(response.getBody());
         return response.getBody();
     }
     
@@ -71,6 +71,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         String url = apiDomain + "/uapi/domestic-stock/v1/quotations/program-trade-by-stock-daily";
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+        		.queryParam("FID_COND_MRKT_DIV_CODE", "J")
                 .queryParam("FID_INPUT_ISCD", code)
                 .queryParam("FID_INPUT_DATE_1", date);
 
@@ -80,7 +81,8 @@ public class AnalysisServiceImpl implements AnalysisService {
         headers.add("authorization", token);
         headers.add("appkey", appKey);
         headers.add("appsecret", appSecret);
-        headers.add("tr_id", "FHPPG04650100");
+        headers.add("tr_id", "FHPPG04650200");
+        headers.add("custtype", "P");
         URI uri = uriBuilder.build().encode().toUri();
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -91,7 +93,7 @@ public class AnalysisServiceImpl implements AnalysisService {
             String.class
         );
         
-        log.info(response.getBody());
+        // log.info(response.getBody());
         return response.getBody();
     }
 }
