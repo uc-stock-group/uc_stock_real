@@ -70,8 +70,8 @@
         }
 		
 		// 일자별, 시간별 선택에 따라 date input 활성화
-		document.addEventListener('DOMContentLoaded', function() {
-		    const radioButtons = document.querySelectorAll('input[name="optionBtn"]');
+		window.onload = function(){
+			const radioButtons = document.querySelectorAll('input[name="optionBtn"]');
 		    
 		    radioButtons.forEach(function(radio) {
 		        radio.addEventListener('change', function(event) {
@@ -83,8 +83,7 @@
 					}
 		        });
 		    });
-		});
-		
+		};
 		
     </script>
 </head>

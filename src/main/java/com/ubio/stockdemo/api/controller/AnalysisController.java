@@ -25,7 +25,7 @@ public class AnalysisController {
         modelAndView.setViewName("programTrade"); // 뷰 페이지
         modelAndView.addObject("tradeList", data);
         modelAndView.addObject("tName", name);
-        System.out.println(data);
+   
         return modelAndView;
     }
 
@@ -36,9 +36,9 @@ public class AnalysisController {
 
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("programDaily"); // 뷰 페이지
-        modelAndView.addObject("tradeList", data);
+        modelAndView.addObject("dataList", data);
         modelAndView.addObject("tName", name);
-        System.out.println(data);
+
         return modelAndView;
     }
 

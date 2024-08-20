@@ -24,7 +24,7 @@
 </head>
 <body>
     <h1 th:text="${tName}"></h1>
-    <div id="jsonData" style="display: none;">[[${tradeList}]]</div>
+    <div id="jsonData" style="display: none;">[[${dataList}]]</div>
     <table id="dataTable">
         <thead>
             <tr>
@@ -52,11 +52,10 @@
             // 시간
             let eventDate = document.createElement('td');
             let year = item.stck_bsop_date.substr(0, 4);
-            let month = item.stck_bsop_date.substr(4, 6);
-            let day = item.stck_bsop_date.substr(6, 8);
+            let month = item.stck_bsop_date.substr(4, 2);
+            let day = item.stck_bsop_date.substr(6, 2);
             eventDate.textContent =  year + "-" + month + "-" + day;
 	
-			/*
             // 현재가
             let prpr = document.createElement('td');
             prpr.textContent = item.stck_clpr;
@@ -85,13 +84,12 @@
             let acmlVol = document.createElement('td');
             acmlVol.textContent = item.acml_vol;
 
-            row.appendChild(eventTime);
+            row.appendChild(eventDate);
             row.appendChild(prpr);
             row.appendChild(vrss);
             row.appendChild(ctrt);
             row.appendChild(acmlVol);
             tbody.appendChild(row);
-			*/
         });
     </script>
 </body>
