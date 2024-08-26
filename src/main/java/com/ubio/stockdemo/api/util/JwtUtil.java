@@ -39,23 +39,18 @@ public class JwtUtil {
     public String createToken(User user, StockToken stockToken) {
 //  user 정보를 이용하여 JWT 토큰을 생성하는 메소드
         Date nowDate = new Date();
-        long now = (new Date()).getTime();
-        Date validity = new Date(now + this.tokenValidityInMilliseconds);
+        long now = nowDate.getTime();
+        long validityInMilliseconds = 1000 * 60 * 60 * 12; // 12시간
 
 //        access token 생성
         return Jwts.builder()
                 .setSubject(String.valueOf(user.getId()))
-//                .claim(AUTHORITIES_KEY, user.getPrivilege().getId())
-                .signWith(SignatureAlgorithm.HS512, secret)
                 .setIssuedAt(nowDate)
-                .setExpiration(validity)
-                .issuer("uc_stock")
+                .setExpiration(new Date(now + validityInMilliseconds))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .setIssuer("uc_stock")
                 .claim("name", user.getUsername())
-//                .claim("accountNo", user.getRealCano())
-//                .claim("appKey", user.getAppKey())
-//                .claim("appSecret", user.getAppSecret())
-                .claim("access_token", stockToken.getAccess_token())
-                .claim("token_token_expired", stockToken.getAccess_token_token_expired())
+                .claim("stock_access_token", stockToken.getAccess_token())
                 .compact();
     }
 
@@ -75,15 +70,7 @@ public class JwtUtil {
         }
     }
 
-    public String extractUserLoginId(String token) {
-        return extractAllClaims(token).getSubject();
-    }
-
-    public String extractPrivilegeId(String token) {
-        return extractAllClaims(token).get(AUTHORITIES_KEY, String.class);
-    }
-
-    public String extractUserName(String token) {
+    public String extractUsername(String token) {
         return extractAllClaims(token).get("name", String.class);
     }
 
@@ -92,11 +79,15 @@ public class JwtUtil {
     }
 
     public boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        try {
+            return extractExpiration(token).before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 
-    public boolean validateToken(String token, String userLoginId) {
-        final String username = extractUserLoginId(token);
-        return (username.equals(userLoginId) && !isTokenExpired(token));
+    public Boolean validateToken(String token, User user) {
+        final String username = extractUsername(token);
+        return (username.equals(user.getUsername()) && !isTokenExpired(token));
     }
 }

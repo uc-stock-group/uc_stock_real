@@ -12,8 +12,10 @@ import com.ubio.stockdemo.model.dto.LoginDto;
 import com.ubio.stockdemo.model.dto.LoginResponse;
 import com.ubio.stockdemo.model.dto.StockToken;
 import com.ubio.stockdemo.model.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -121,15 +123,20 @@ public class UserServiceImpl implements UserService {
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setId(user.getId());
             loginResponse.setUsername(user.getUsername());
-//            loginResponse.setAppKey(user.getAppKey());
-//            loginResponse.setAppSecret(user.getAppSecret());
-//            loginResponse.setRealCano(user.getRealCano());
-            loginResponse.setStockToken(stockToken);
             loginResponse.setAccessToken(accessToken);
-
             return loginResponse;
         } else {
             throw new RuntimeException("Invalid username or password");
         }
+    }
+    @Override
+    public ResponseEntity<String> validateToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        if (jwtUtil.isTokenExpired(token)) {
+            log.info("Token expired");
+//            TODO: 토큰 만료시 재발급
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+        }
+        return ResponseEntity.ok("Token is valid");
     }
 }

@@ -3,6 +3,7 @@ package com.ubio.stockdemo.api.service;
 import com.ubio.stockdemo.model.dto.LoginDto;
 import com.ubio.stockdemo.model.dto.LoginResponse;
 import com.ubio.stockdemo.model.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface UserService {
     ResponseEntity<List<User>> findAllPaging(int page, int size);
 
     LoginResponse login(LoginDto loginDto) throws Exception;
+
+    ResponseEntity<String> validateToken(HttpServletRequest request);
 }

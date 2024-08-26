@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Creation and Login</title>
+</head>
+<body>
+<h1>User Handle</h1>
+
+<h2>Create User</h2>
+<form id="createUserForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required><br><br>
+
+    <label for="hash">Password:</label>
+    <input type="password" id="hash" name="hash" required><br><br>
+
+    <label for="appKey">App Key:</label>
+    <input type="text" id="appKey" name="appKey" required><br><br>
+
+    <label for="appSecret">App Secret:</label>
+    <input type="text" id="appSecret" name="appSecret" required><br><br>
+
+    <label for="realCano">Real Cano:</label>
+    <input type="text" id="realCano" name="realCano" required><br><br>
+
+    <button type="button" onclick="createUser()">Create User</button>
+</form>
+<hr>
+<h2>User Login</h2>
+<form id="loginForm">
+    <label for="loginUsername">Username:</label>
+    <input type="text" id="loginUsername" name="username" required><br><br>
+
+    <label for="loginPassword">Password:</label>
+    <input type="password" id="loginPassword" name="password" required><br><br>
+
+    <button type="button" onclick="loginUser()">Login</button>
+</form>
+
+<hr>
+
+<!-- Token Validation -->
+<h2>Validate Token</h2>
+<button type="button" onclick="validateToken()">Validate Token</button>
+
+<script>
+    function createUser() {
+        const user = {
+            username: document.getElementById('username').value,
+            hash: document.getElementById('hash').value,
+            appKey: document.getElementById('appKey').value,
+            appSecret: document.getElementById('appSecret').value,
+            realCano: document.getElementById('realCano').value
+        };
+
+        fetch('/api/v1/user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        })
+            .then(response => response.json())
+            .then(data => alert('User created successfully: ' + JSON.stringify(data)))
+            .catch(error => console.error('Error:', error));
+    }
+
+    function loginUser() {
+        const loginDto = {
+            username: document.getElementById('loginUsername').value,
+            password: document.getElementById('loginPassword').value
+        };
+
+        fetch('/api/v1/user/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loginDto)
+        })
+            .then(response => response.json())
+            .then(data => {
+                accessToken = data.accessToken; // 받은 accessToken을 저장
+                alert('Login successful: ' + JSON.stringify(data));
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    function validateToken() {
+        if (!accessToken) {
+            alert('로그인 후 토큰을 검사할 수 있습니다.');
+            return;
+        }
+
+        fetch('/api/v1/user/validate-token', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            }
+        })
+            .then(response => response.text())
+            .then(data => alert('Result: ' + data))
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>
