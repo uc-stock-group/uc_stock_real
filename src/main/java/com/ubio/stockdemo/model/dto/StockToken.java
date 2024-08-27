@@ -3,7 +3,7 @@ package com.ubio.stockdemo.model.dto;
 import lombok.Data;
 
 @Data
-public class AccessToken {
+public class StockToken {
     private String access_token;
     private String access_token_token_expired;
     private String token_type;

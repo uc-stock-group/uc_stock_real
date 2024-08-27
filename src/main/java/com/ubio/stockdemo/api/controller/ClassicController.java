@@ -14,8 +14,8 @@ public class ClassicController {
     @Autowired
     private UserService userService;
 
-//    @GetMapping("/")
-//    public String index() {
-//        return "index";
-//    }
+    @GetMapping("/userhandle")
+    public String index() {
+        return "userhandle";
+    }
 }

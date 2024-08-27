@@ -1,8 +1,9 @@
-package com.ubio.stockdemo.api.service;
+package com.ubio.stockdemo.api.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ubio.stockdemo.model.dto.AccessToken;
+import com.ubio.stockdemo.api.service.ApiService;
+import com.ubio.stockdemo.model.dto.StockToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -110,7 +111,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public AccessToken getAccessToken(String appKey, String appSecret) {
+    public StockToken getAccessToken(String appKey, String appSecret) {
         String url = apiDomain + "/oauth2/tokenP";
 
         HttpHeaders headers = new HttpHeaders();
@@ -141,13 +142,13 @@ public class ApiServiceImpl implements ApiService {
         );
         log.info(response.getBody());
 
-        AccessToken accessToken = null;
+        StockToken stockToken = null;
         try {
-            accessToken = objectMapper.readValue(response.getBody(), AccessToken.class);
+            stockToken = objectMapper.readValue(response.getBody(), StockToken.class);
         } catch (JsonProcessingException e) {
             log.error("Error parsing JSON response", e);
         }
 
-        return accessToken;
+        return stockToken;
     }
 }

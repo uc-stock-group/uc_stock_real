@@ -1,23 +1,29 @@
-package com.ubio.stockdemo.api.service;
+package com.ubio.stockdemo.api.service.impl;
 
 import com.ubio.stockdemo.api.repository.UserRepository;
+import com.ubio.stockdemo.api.service.ApiService;
+import com.ubio.stockdemo.api.service.UserService;
 import com.ubio.stockdemo.api.util.EncryptionUtil;
+import com.ubio.stockdemo.api.util.JwtUtil;
 import com.ubio.stockdemo.api.util.PasswordUtil;
-import com.ubio.stockdemo.model.dto.AccessToken;
+
+import com.ubio.stockdemo.model.dto.JwtDto;
 import com.ubio.stockdemo.model.dto.LoginDto;
 import com.ubio.stockdemo.model.dto.LoginResponse;
+import com.ubio.stockdemo.model.dto.StockToken;
 import com.ubio.stockdemo.model.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -31,7 +37,8 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private EncryptionUtil encryptionUtil;
 
-
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Override
     public ResponseEntity<User> create(User user) throws Exception {
@@ -41,8 +48,6 @@ public class UserServiceImpl implements UserService{
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().build();
         }
-
-//        TODO: password encrypt
 
 //        비밀번호 validation
         if (user.getHash().length() < 8) {
@@ -59,8 +64,6 @@ public class UserServiceImpl implements UserService{
 //        hash 대칭키로 암호화
         user.setHash(encryptionUtil.encrypt(user.getHash()));
 
-//        TODO: appkey, secretkey, cano encrypt
-
         //appkey 대칭키로 암호화
         user.setAppKey(encryptionUtil.encrypt(user.getAppKey()));
 
@@ -70,12 +73,9 @@ public class UserServiceImpl implements UserService{
         //cano encrypt
         user.setRealCano(encryptionUtil.encrypt(user.getRealCano()));
 
-//        TODO: save user to database
-
         userRepository.save(user);
 
         return ResponseEntity.ok(user);
-
     }
 
     @Override
@@ -114,20 +114,29 @@ public class UserServiceImpl implements UserService{
             user.setAppSecret(encryptionUtil.decrypt(user.getAppSecret()));
             user.setRealCano(encryptionUtil.decrypt(user.getRealCano()));
 
-//            accesstoken 발급받기
-            AccessToken accessToken = apiService.getAccessToken(user.getAppKey(), user.getAppSecret());
+//            한투에서 accesstoken 발급받기
+            StockToken stockToken = apiService.getAccessToken(user.getAppKey(), user.getAppSecret());
+            
+//          자체 Jwt 토큰 발급(토큰 안에 한투 토큰 넣기)
+            String accessToken = jwtUtil.createToken(user, stockToken);
 
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setId(user.getId());
             loginResponse.setUsername(user.getUsername());
-            loginResponse.setAppKey(user.getAppKey());
-            loginResponse.setAppSecret(user.getAppSecret());
-            loginResponse.setRealCano(user.getRealCano());
             loginResponse.setAccessToken(accessToken);
-
             return loginResponse;
         } else {
             throw new RuntimeException("Invalid username or password");
         }
+    }
+    @Override
+    public ResponseEntity<String> validateToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        if (jwtUtil.isTokenExpired(token)) {
+            log.info("Token expired");
+//            TODO: 토큰 만료시 재발급
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+        }
+        return ResponseEntity.ok("Token is valid");
     }
 }

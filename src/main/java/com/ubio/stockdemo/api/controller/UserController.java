@@ -4,8 +4,10 @@ import com.ubio.stockdemo.api.service.UserService;
 import com.ubio.stockdemo.model.dto.LoginDto;
 import com.ubio.stockdemo.model.dto.LoginResponse;
 import com.ubio.stockdemo.model.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,7 @@ public class UserController {
 
         @Autowired
         private UserService userService;
+
 
         @PostMapping
         public ResponseEntity<User> create(@RequestBody User user) throws Exception {
@@ -56,5 +59,9 @@ public class UserController {
         @PostMapping("/login")
         public LoginResponse login(@RequestBody LoginDto loginDto) throws Exception {
             return userService.login(loginDto);
+        }
+        @GetMapping("/validate-token")
+        public ResponseEntity<String> validateToken(HttpServletRequest request) {
+                return userService.validateToken(request);
         }
 }
