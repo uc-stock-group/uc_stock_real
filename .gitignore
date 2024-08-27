@@ -39,4 +39,3 @@ out/
 ### Java ###
 #application.yml
 src/main/resources/application.yml
-src/main/resources/static/
