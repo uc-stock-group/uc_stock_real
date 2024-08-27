@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis</title>
+    <style>
+		#option {
+			margin: 20px;
+		}
+		
+		#calendar {
+			width: 130px;
+			height: 25px;
+			text-align: center;
+			font-size: 14px;
+		}
+		
+        table {
+			border: 1px solid black;
+            margin: auto;
+            width: 70%;
+            border-collapse: collapse;
+        }
+		
+		thead {
+			border: 1px solid black;
+		}
+		
+		th {
+            border: none;
+            padding: 8px;
+            text-align: left;
+        }
+		
+        td {
+            border: none;
+            padding: 10px;
+            text-align: center;
+        }
+		
+        .codeLink {
+            text-decoration: underline;
+            color: darkblue;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function redirectToDetails(code, name) {
+			let option = document.querySelector('input[name="optionBtn"]:checked').value;
+			
+			switch (option){
+				case "time":
+				let url1 = '/analysis/program?code=' + code;
+	            url1 += '&name=' + name;
+	            window.location.href = url1;
+				break;
+				
+				case "date":
+				let day = document.getElementById('calendar').value;
+				day = day.replaceAll("-", "");
+				
+				let url2 = '/analysis/programDaily?code=' + code;
+				url2 += '&date=' + day;
+	            url2 += '&name=' + name;
+	            window.location.href = url2;
+				break;
+			}
+			
+            
+        }
+		
+		// 일자별, 시간별 선택에 따라 date input 활성화
+		window.onload = function(){
+			const radioButtons = document.querySelectorAll('input[name="optionBtn"]');
+		    
+		    radioButtons.forEach(function(radio) {
+		        radio.addEventListener('change', function(event) {
+		            const selectedValue = event.target.value;
+		            if (selectedValue == "date"){
+						calendar.removeAttribute("disabled");	
+					} else {
+						calendar.setAttribute("disabled");
+					}
+		        });
+		    });
+		};
+		
+    </script>
+</head>
+<body>
+    <h1></h1>
+	<div id="option">
+		<input type="radio" id="op1" name="optionBtn" value="time" checked />
+	    <label for="op1">시간별</label>
+	
+	    <input type="radio" id="op2" name="optionBtn" value="date" />
+		<label for="op2" style="margin-right: 25px;">일자별</label>
+		
+		<input type="date" id="calendar" disabled/>
+	</div>
+    <div id="jsonData" style="display: none;">[[${jsonData}]]</div>
+    <table id="dataTable">
+
+    </table>
+
+    <script>
+		const calendar = document.getElementById('calendar');
+		calendar.value = new Date().toISOString().substring(0, 10);
+		calendar.max = new Date().toISOString().substring(0, 10);
+        let jsonDataElement = document.getElementById('jsonData');
+        let jsonData = jsonDataElement.textContent;
+        let data = JSON.parse(jsonData); // 서버에서 전달받은 json 파싱
+        //let tbody = document.querySelector('#dataTable tbody');
+		let table = document.querySelector('#dataTable');
+
+        // JSON 데이터를 테이블에 추가	
+		data.forEach(item => {
+			let thead = document.createElement('thead');
+			let htr = document.createElement('tr');
+			let hth = document.createElement('th');
+            hth.textContent = item.Name;
+			hth.setAttribute("colspan", 10);
+			htr.appendChild(hth);
+			thead.appendChild(htr);
+			table.appendChild(thead);
+			
+			// Code 번호들 추가
+			let tbodyNum = document.createElement('tbody');
+			let r = document.createElement('tr');
+			var count = 0;
+			item.Code.forEach(nums => {
+				count += 1;
+				let td = document.createElement('td');
+				td.textContent = nums;
+				td.setAttribute("class", "codeLink");
+				td.onclick = () => redirectToDetails(nums, item.Name);
+				r.appendChild(td);
+				if (count == 10){
+					tbodyNum.appendChild(r);
+					r = document.createElement('tr');
+					count = 0;
+				}
+			});
+			
+			tbodyNum.appendChild(r);
+			table.appendChild(tbodyNum);
+        });
+
+    </script>
+</body>
+</html>
